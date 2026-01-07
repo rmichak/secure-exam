@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Blocked</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+        }
+
+        .icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: rgba(231, 76, 60, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon svg {
+            width: 60px;
+            height: 60px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #e74c3c;
+        }
+
+        .message {
+            font-size: 18px;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .url-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #00d4ff;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="#e74c3c" stroke-width="2"/>
+                <line x1="8" y1="8" x2="16" y2="16" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>
+                <line x1="16" y1="8" x2="8" y2="16" stroke="#e74c3c" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+
+        <h1>Website Blocked</h1>
+
+        <p class="message">
+            This website is not available in this environment.<br>
+            Only approved resources are accessible.
+        </p>
+
+        <div class="url-box">
+            %U
+        </div>
+
+        <div class="info-box">
+            <h3>Need access to a website?</h3>
+            <p>
+                If you believe this website should be accessible,
+                please contact your administrator. They can
+                add it to the approved list if appropriate.
+            </p>
+        </div>
+
+        <div class="footer">
+            Secure Environment | Access Policy Enforced
+        </div>
+    </div>
+</body>
+</html>

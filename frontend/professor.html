@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeLab LMS - Professor Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-900: #0a1628;
+      --navy-800: #121f36;
+      --navy-700: #1a2d4d;
+      --navy-600: #243a5e;
+      --slate-400: #8b9bb4;
+      --slate-300: #a8b5c9;
+      --cream: #f8f6f3;
+      --cream-dark: #e8e4df;
+      --amber-500: #d4a853;
+      --amber-400: #e6bc6a;
+      --amber-300: #f0d08a;
+      --emerald-500: #2d8a6e;
+      --rose-500: #c45c5c;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Work Sans', -apple-system, sans-serif;
+      --shadow-soft: 0 4px 20px rgba(10, 22, 40, 0.08);
+      --shadow-medium: 0 8px 30px rgba(10, 22, 40, 0.12);
+      --shadow-elevated: 0 20px 50px rgba(10, 22, 40, 0.18);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background: var(--cream);
+      color: var(--navy-900);
+      min-height: 100vh;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+    .header {
+      background: var(--navy-900);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo-mark {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--amber-500), var(--amber-400));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .nav-tab {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--slate-300);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .nav-tab:hover { background: var(--navy-700); color: var(--cream); }
+    .nav-tab.active { background: var(--amber-500); color: var(--navy-900); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--slate-300);
+      font-size: 0.9rem;
+    }
+    .user-name {
+      color: var(--cream);
+      font-weight: 500;
+    }
+    .user-role {
+      background: var(--navy-700);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .user-role.admin {
+      background: var(--amber-500);
+      color: var(--navy-900);
+    }
+    .btn-logout {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--slate-300);
+      background: transparent;
+      border: 1px solid var(--navy-600);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .btn-logout:hover {
+      background: var(--navy-700);
+      color: var(--cream);
+      border-color: var(--navy-500);
+    }
+    .main { max-width: 1400px; margin: 0 auto; padding: 2.5rem; }
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+    .page-subtitle { font-size: 1rem; color: var(--slate-400); margin-top: 0.3rem; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .btn-primary { background: var(--navy-800); color: var(--cream); }
+    .btn-primary:hover { background: var(--navy-700); transform: translateY(-1px); }
+    .btn-amber { background: linear-gradient(135deg, var(--amber-500), var(--amber-400)); color: var(--navy-900); }
+    .btn-amber:hover { transform: translateY(-1px); box-shadow: var(--shadow-medium); }
+    .btn-ghost { background: transparent; color: var(--navy-700); border: 1px solid var(--cream-dark); }
+    .btn-ghost:hover { background: var(--cream-dark); }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.8rem; }
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.5rem;
+    }
+    .course-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 1.8rem;
+      box-shadow: var(--shadow-soft);
+      transition: var(--transition-smooth);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .course-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--amber-500), var(--amber-300));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-elevated); }
+    .course-card:hover::before { transform: scaleX(1); }
+    .course-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+    .course-name { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; color: var(--navy-900); }
+    .course-badge {
+      padding: 0.3rem 0.8rem;
+      background: var(--navy-800);
+      color: var(--amber-400);
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .course-description { color: var(--slate-400); font-size: 0.95rem; margin-bottom: 1.2rem; }
+    .course-stats { display: flex; gap: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--cream-dark); }
+    .stat { display: flex; align-items: center; gap: 0.4rem; }
+    .stat-value { font-weight: 600; color: var(--navy-800); }
+    .stat-label { color: var(--slate-400); font-size: 0.85rem; }
+    .empty-state { text-align: center; padding: 5rem 2rem; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); }
+    .empty-icon { width: 80px; height: 80px; margin: 0 auto 1.5rem; background: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    .empty-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 600; color: var(--navy-800); margin-bottom: 0.5rem; }
+    .empty-text { color: var(--slate-400); margin-bottom: 1.5rem; }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 22, 40, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: white;
+      border-radius: var(--radius-lg);
+      width: 90%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-elevated);
+    }
+    .modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--cream-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; color: var(--navy-900); }
+    .modal-close {
+      width: 36px; height: 36px;
+      border: none;
+      background: var(--cream);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-close:hover { background: var(--cream-dark); }
+    .modal-body { padding: 2rem; }
+    .modal-footer { padding: 1.5rem 2rem; border-top: 1px solid var(--cream-dark); display: flex; gap: 1rem; justify-content: flex-end; }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--navy-700); margin-bottom: 0.5rem; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      border: 1px solid var(--cream-dark);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      color: var(--navy-900);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--amber-500);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.15);
+    }
+    .form-textarea { min-height: 100px; resize: vertical; }
+    .course-detail { display: none; }
+    .course-detail.active { display: block; }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--slate-400);
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    .back-btn:hover { color: var(--navy-800); }
+    .detail-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; }
+    .detail-title { font-family: var(--font-display); font-size: 2.5rem; font-weight: 600; color: var(--navy-900); }
+    .detail-meta { color: var(--slate-400); font-size: 1rem; margin-top: 0.3rem; }
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--cream-dark); padding-bottom: 0.5rem; }
+    .tab {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--slate-400);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      position: relative;
+    }
+    .tab::after {
+      content: '';
+      position: absolute;
+      bottom: -0.5rem; left: 0; right: 0;
+      height: 2px;
+      background: var(--amber-500);
+      transform: scaleX(0);
+      transition: transform 0.2s ease;
+    }
+    .tab:hover { color: var(--navy-800); }
+    .tab.active { color: var(--navy-900); }
+    .tab.active::after { transform: scaleX(1); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .table-container { background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-soft); overflow: hidden; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th {
+      text-align: left;
+      padding: 1rem 1.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--slate-400);
+      background: var(--cream);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--cream-dark); }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover td { background: var(--cream); }
+    .student-name { font-weight: 500; color: var(--navy-900); }
+    .student-email { font-size: 0.85rem; color: var(--slate-400); }
+    .status-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem; font-size: 0.75rem; font-weight: 500; border-radius: 20px; }
+    .status-badge.running { background: rgba(45, 138, 110, 0.1); color: var(--emerald-500); }
+    .status-badge.stopped { background: rgba(139, 155, 180, 0.15); color: var(--slate-400); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .access-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-family: monospace;
+      color: var(--navy-700);
+      cursor: pointer;
+    }
+    .access-link:hover { background: var(--amber-300); }
+    .actions { display: flex; gap: 0.5rem; }
+    .toast {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      padding: 1rem 1.5rem;
+      background: var(--navy-800);
+      color: var(--cream);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-elevated);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: var(--transition-smooth);
+      z-index: 300;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark">S</div>
+      <span class="logo-text">SecureExam</span>
+    </div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-view="courses">Courses</button>
+      <button class="nav-tab" data-view="templates">Templates</button>
+      <button class="nav-tab" data-view="settings" id="settingsTab" style="display: none;">Settings</button>
+    </nav>
+    <div class="header-right">
+      <div class="user-info">
+        <span class="user-name" id="userName">Loading...</span>
+        <span class="user-role" id="userRole">-</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="coursesView" class="view active">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Courses</h1>
+          <p class="page-subtitle">Manage your courses and enrolled students</p>
+        </div>
+        <button class="btn btn-amber" onclick="showModal('courseModal')">+ New Course</button>
+      </div>
+      <div id="coursesList" class="courses-grid"></div>
+    </div>
+
+    <div id="templatesView" class="view" style="display: none;">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Restriction Templates</h1>
+          <p class="page-subtitle">Define security profiles for assignments and exams</p>
+        </div>
+        <button class="btn btn-amber" onclick="showModal('templateModal')">+ New Template</button>
+      </div>
+      <div id="templatesList" class="courses-grid"></div>
+    </div>
+
+    <div id="courseDetail" class="course-detail">
+      <div class="back-btn" onclick="showCoursesView()">← Back to Courses</div>
+      <div class="detail-header">
+        <div>
+          <h1 class="detail-title" id="detailCourseName"></h1>
+          <p class="detail-meta" id="detailCourseMeta"></p>
+        </div>
+        <button class="btn btn-ghost" onclick="editCurrentCourse()">Edit Course</button>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="students">Students</button>
+        <button class="tab" data-tab="assignments">Assignments</button>
+      </div>
+      <div id="studentsTab" class="tab-content active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3 style="font-family: var(--font-display); font-size: 1.3rem;">Enrolled Students</h3>
+          <button class="btn btn-primary btn-sm" onclick="showModal('enrollModal')">+ Enroll Student</button>
+        </div>
+        <div id="enrollmentsList" class="table-container"></div>
+      </div>
+      <div id="assignmentsTab" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h3 style="font-family: var(--font-display); font-size: 1.3rem;">Assignments</h3>
+          <button class="btn btn-primary btn-sm" onclick="showModal('assignmentModal')">+ New Assignment</button>
+        </div>
+        <div id="assignmentsList" class="table-container"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="courseModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="courseModalTitle">New Course</h2>
+        <button class="modal-close" onclick="hideModal('courseModal')">×</button>
+      </div>
+      <form id="courseForm" onsubmit="saveCourse(event)">
+        <div class="modal-body">
+          <input type="hidden" id="courseId">
+          <div class="form-group">
+            <label class="form-label">Course Name</label>
+            <input type="text" class="form-input" id="courseName" placeholder="e.g., CS101 Intro to Python" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="courseDescription" placeholder="Brief course description..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Programming Language</label>
+            <select class="form-select" id="courseLanguage">
+              <option value="python">Python</option>
+              <option value="node">Node.js</option>
+              <option value="java">Java</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="hideModal('courseModal')">Cancel</button>
+          <button type="submit" class="btn btn-amber">Save Course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="enrollModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Enroll Student</h2>
+        <button class="modal-close" onclick="hideModal('enrollModal')">×</button>
+      </div>
+      <form id="enrollForm" onsubmit="enrollStudent(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Select Existing Student</label>
+            <select class="form-select" id="existingStudentSelect">
+              <option value="">-- Select or create new --</option>
+            </select>
+          </div>
+          <p style="text-align: center; color: var(--slate-400); margin: 1rem 0;">— or create new —</p>
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-input" id="studentFirstName" placeholder="John">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-input" id="studentLastName" placeholder="Doe">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="studentEmail" placeholder="john.doe@example.com">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="hideModal('enrollModal')">Cancel</button>
+          <button type="submit" class="btn btn-amber">Enroll Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="templateModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="templateModalTitle">New Template</h2>
+        <button class="modal-close" onclick="hideModal('templateModal')">×</button>
+      </div>
+      <form id="templateForm" onsubmit="saveTemplate(event)">
+        <div class="modal-body">
+          <input type="hidden" id="templateId">
+          <div class="form-group">
+            <label class="form-label">Template Name</label>
+            <input type="text" class="form-input" id="templateName" placeholder="e.g., Open Homework" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" id="templateClipboard" checked>
+              Allow Clipboard (Copy/Paste)
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+              <input type="checkbox" id="templateExamMode">
+              Exam Mode (Separate Container)
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Allowed Websites (one per line)</label>
+            <textarea class="form-textarea" id="templateAllowlist" rows="6" placeholder="docs.python.org
+stackoverflow.com"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="hideModal('templateModal')">Cancel</button>
+          <button type="submit" class="btn btn-amber">Save Template</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="assignmentModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="assignmentModalTitle">New Assignment</h2>
+        <button class="modal-close" onclick="hideModal('assignmentModal')">×</button>
+      </div>
+      <form id="assignmentForm" onsubmit="saveAssignment(event)">
+        <div class="modal-body">
+          <input type="hidden" id="assignmentId">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-input" id="assignmentTitle" placeholder="e.g., Lab 1: Hello World" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Folder Name</label>
+            <input type="text" class="form-input" id="assignmentFolder" placeholder="e.g., lab-1" required pattern="[a-z0-9\-]+" title="Lowercase letters, numbers, and hyphens only">
+            <small style="color: var(--slate-400); font-size: 0.8rem;">Lowercase letters, numbers, and hyphens only</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructions (Markdown)</label>
+            <textarea class="form-textarea" id="assignmentInstructions" rows="8" placeholder="## Objective
+
+Write a Python program that...
+
+## Requirements
+
+- Requirement 1
+- Requirement 2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date (optional)</label>
+            <input type="datetime-local" class="form-input" id="assignmentDueDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Restriction Template (optional)</label>
+            <select class="form-select" id="assignmentTemplate">
+              <option value="">-- No restrictions --</option>
+            </select>
+          </div>
+          <div class="form-group" style="padding: 1rem; background: var(--cream); border-radius: var(--radius-sm); margin-top: 1rem;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <input type="checkbox" id="assignmentIsExam" onchange="toggleExamFields()">
+              <strong style="color: var(--rose-500);">This is a timed exam</strong>
+            </label>
+            <div id="examFields" style="display: none;">
+              <div class="form-group">
+                <label class="form-label">Exam Start Time</label>
+                <input type="datetime-local" class="form-input" id="assignmentStartTime">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Exam End Time</label>
+                <input type="datetime-local" class="form-input" id="assignmentEndTime">
+              </div>
+              <small style="color: var(--slate-400);">Students can only access the exam during this time window. Containers auto-terminate when time expires.</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" onclick="hideModal('assignmentModal')">Cancel</button>
+          <button type="submit" class="btn btn-amber">Save Assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="submissionsModal" class="modal-overlay">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="submissionsModalTitle">Submissions</h2>
+        <button class="modal-close" onclick="hideModal('submissionsModal')">×</button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <div id="submissionsList"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="hideModal('submissionsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="examSessionsModal" class="modal-overlay">
+    <div class="modal" style="max-width: 900px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="examSessionsModalTitle">Exam Sessions</h2>
+        <button class="modal-close" onclick="hideModal('examSessionsModal')">×</button>
+      </div>
+      <div class="modal-body" style="padding: 0;">
+        <div id="examStudentsList"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="hideModal('examSessionsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    var API = '';
+    var currentCourseId = null;
+    var courses = [];
+    var students = [];
+    var templates = [];
+    var assignments = [];
+    var currentAssignmentId = null;
+    var currentExamAssignment = null;
+
+    document.querySelectorAll('.nav-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.nav-tab').forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var view = tab.dataset.view;
+        document.getElementById('coursesView').style.display = view === 'courses' ? 'block' : 'none';
+        document.getElementById('templatesView').style.display = view === 'templates' ? 'block' : 'none';
+        document.getElementById('courseDetail').classList.remove('active');
+      });
+    });
+
+    document.querySelectorAll('.tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab + 'Tab').classList.add('active');
+      });
+    });
+
+    function showModal(id) { document.getElementById(id).classList.add('active'); }
+    function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      var div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function loadCourses() {
+      fetch(API + '/api/courses')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          courses = data;
+          renderCourses();
+        });
+    }
+
+    function loadStudents() {
+      fetch(API + '/api/students')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          students = data;
+          renderStudentSelect();
+        });
+    }
+
+    function loadTemplates() {
+      fetch(API + '/api/templates')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          templates = data;
+          renderTemplates();
+        });
+    }
+
+    function renderCourses() {
+      var container = document.getElementById('coursesList');
+      if (courses.length === 0) {
+        container.textContent = '';
+        var empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.style.gridColumn = '1/-1';
+        empty.innerHTML = '<div class="empty-icon">📚</div><h3 class="empty-title">No courses yet</h3><p class="empty-text">Create your first course to get started</p>';
+        var btn = document.createElement('button');
+        btn.className = 'btn btn-amber';
+        btn.textContent = 'Create Course';
+        btn.onclick = function() { showModal('courseModal'); };
+        empty.appendChild(btn);
+        container.appendChild(empty);
+        return;
+      }
+      container.textContent = '';
+      courses.forEach(function(course) {
+        var card = document.createElement('div');
+        card.className = 'course-card';
+        card.onclick = function() { showCourseDetail(course.id); };
+        var header = document.createElement('div');
+        header.className = 'course-header';
+        var name = document.createElement('h3');
+        name.className = 'course-name';
+        name.textContent = course.name;
+        var badge = document.createElement('span');
+        badge.className = 'course-badge';
+        badge.textContent = course.language;
+        header.appendChild(name);
+        header.appendChild(badge);
+        var desc = document.createElement('p');
+        desc.className = 'course-description';
+        desc.textContent = course.description || 'No description';
+        var stats = document.createElement('div');
+        stats.className = 'course-stats';
+        var stat = document.createElement('div');
+        stat.className = 'stat';
+        var statVal = document.createElement('span');
+        statVal.className = 'stat-value';
+        statVal.id = 'enrollCount' + course.id;
+        statVal.textContent = '-';
+        var statLabel = document.createElement('span');
+        statLabel.className = 'stat-label';
+        statLabel.textContent = 'students';
+        stat.appendChild(statVal);
+        stat.appendChild(statLabel);
+        stats.appendChild(stat);
+        card.appendChild(header);
+        card.appendChild(desc);
+        card.appendChild(stats);
+        container.appendChild(card);
+        fetch(API + '/api/courses/' + course.id + '/enrollments')
+          .then(function(res) { return res.json(); })
+          .then(function(enrollments) {
+            var el = document.getElementById('enrollCount' + course.id);
+            if (el) el.textContent = enrollments.length;
+          });
+      });
+    }
+
+    function renderTemplates() {
+      var container = document.getElementById('templatesList');
+      if (templates.length === 0) {
+        container.textContent = '';
+        var empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.style.gridColumn = '1/-1';
+        empty.innerHTML = '<div class="empty-icon">🔒</div><h3 class="empty-title">No templates yet</h3><p class="empty-text">Create restriction templates for your assignments</p>';
+        container.appendChild(empty);
+        return;
+      }
+      container.textContent = '';
+      templates.forEach(function(t) {
+        var card = document.createElement('div');
+        card.className = 'course-card';
+        card.onclick = function() { editTemplate(t.id); };
+        var header = document.createElement('div');
+        header.className = 'course-header';
+        var name = document.createElement('h3');
+        name.className = 'course-name';
+        name.textContent = t.name;
+        header.appendChild(name);
+        if (t.is_exam_mode) {
+          var badge = document.createElement('span');
+          badge.className = 'course-badge';
+          badge.style.background = 'var(--rose-500)';
+          badge.style.color = 'white';
+          badge.textContent = 'Exam';
+          header.appendChild(badge);
+        }
+        var desc = document.createElement('p');
+        desc.className = 'course-description';
+        desc.textContent = 'Clipboard: ' + (t.clipboard_enabled ? '✓ Allowed' : '✗ Blocked') + '\n' + (t.website_allowlist ? t.website_allowlist.split('\n').length + ' allowed domains' : 'No website restrictions');
+        card.appendChild(header);
+        card.appendChild(desc);
+        container.appendChild(card);
+      });
+    }
+
+    function renderStudentSelect() {
+      var select = document.getElementById('existingStudentSelect');
+      select.textContent = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = '-- Select or create new --';
+      select.appendChild(opt);
+      students.forEach(function(s) {
+        var opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.first_name + ' ' + s.last_name + ' (' + s.email + ')';
+        select.appendChild(opt);
+      });
+    }
+
+    function renderEnrollments(courseId) {
+      fetch(API + '/api/courses/' + courseId + '/enrollments')
+        .then(function(res) { return res.json(); })
+        .then(function(enrollments) {
+          var container = document.getElementById('enrollmentsList');
+          if (enrollments.length === 0) {
+            container.textContent = '';
+            var empty = document.createElement('div');
+            empty.style.padding = '3rem';
+            empty.style.textAlign = 'center';
+            empty.style.color = 'var(--slate-400)';
+            empty.textContent = 'No students enrolled yet';
+            container.appendChild(empty);
+            return;
+          }
+          container.textContent = '';
+          var table = document.createElement('table');
+          table.className = 'table';
+          var thead = document.createElement('thead');
+          var headRow = document.createElement('tr');
+          ['Student', 'Container', 'Access Link', 'Actions'].forEach(function(h) {
+            var th = document.createElement('th');
+            th.textContent = h;
+            headRow.appendChild(th);
+          });
+          thead.appendChild(headRow);
+          table.appendChild(thead);
+          var tbody = document.createElement('tbody');
+          enrollments.forEach(function(e) {
+            var row = document.createElement('tr');
+            var tdStudent = document.createElement('td');
+            var nameDiv = document.createElement('div');
+            nameDiv.className = 'student-name';
+            nameDiv.textContent = e.first_name + ' ' + e.last_name;
+            var emailDiv = document.createElement('div');
+            emailDiv.className = 'student-email';
+            emailDiv.textContent = e.email;
+            tdStudent.appendChild(nameDiv);
+            tdStudent.appendChild(emailDiv);
+
+            // Container status with control buttons
+            var tdStatus = document.createElement('td');
+            var statusContainer = document.createElement('div');
+            statusContainer.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
+            var badge = document.createElement('span');
+            badge.className = 'status-badge ' + (e.container_status === 'running' ? 'running' : 'stopped');
+            var dot = document.createElement('span');
+            dot.className = 'status-dot';
+            badge.appendChild(dot);
+            badge.appendChild(document.createTextNode(' ' + (e.container_status || 'stopped')));
+            statusContainer.appendChild(badge);
+
+            // Container control buttons
+            if (e.container_status === 'running') {
+              var stopBtn = document.createElement('button');
+              stopBtn.className = 'btn btn-ghost btn-sm';
+              stopBtn.textContent = 'Stop';
+              stopBtn.style.cssText = 'padding: 0.2rem 0.5rem; font-size: 0.75rem;';
+              stopBtn.onclick = function(ev) {
+                ev.stopPropagation();
+                stopContainer(e.id, courseId);
+              };
+              statusContainer.appendChild(stopBtn);
+
+              var syncBtn = document.createElement('button');
+              syncBtn.className = 'btn btn-sm';
+              syncBtn.textContent = 'Sync';
+              syncBtn.title = 'Sync assignments to container';
+              syncBtn.style.cssText = 'padding: 0.2rem 0.5rem; font-size: 0.75rem; background: var(--amber-500); color: white;';
+              syncBtn.onclick = function(ev) {
+                ev.stopPropagation();
+                syncContainer(e.id, courseId);
+              };
+              statusContainer.appendChild(syncBtn);
+            } else if (e.container_id) {
+              var startBtn = document.createElement('button');
+              startBtn.className = 'btn btn-primary btn-sm';
+              startBtn.textContent = 'Start';
+              startBtn.style.cssText = 'padding: 0.2rem 0.5rem; font-size: 0.75rem;';
+              startBtn.onclick = function(ev) {
+                ev.stopPropagation();
+                startContainer(e.id, courseId);
+              };
+              statusContainer.appendChild(startBtn);
+            }
+            tdStatus.appendChild(statusContainer);
+
+            var tdLink = document.createElement('td');
+            var link = document.createElement('div');
+            link.className = 'access-link';
+            link.textContent = e.access_token.substring(0, 8) + '...';
+            link.style.cursor = 'pointer';
+            link.onclick = function(ev) {
+              ev.stopPropagation();
+              copyAccessLink(e.access_token);
+            };
+            var copyIcon = document.createElement('span');
+            copyIcon.textContent = ' Copy';
+            copyIcon.style.cssText = 'color: var(--amber-500); font-size: 0.8rem;';
+            link.appendChild(copyIcon);
+            tdLink.appendChild(link);
+
+            var tdActions = document.createElement('td');
+            var removeBtn = document.createElement('button');
+            removeBtn.className = 'btn btn-ghost btn-sm';
+            removeBtn.textContent = 'Remove';
+            removeBtn.style.color = 'var(--rose-500)';
+            removeBtn.onclick = function(ev) {
+              ev.stopPropagation();
+              removeEnrollment(courseId, e.id);
+            };
+            tdActions.appendChild(removeBtn);
+            row.appendChild(tdStudent);
+            row.appendChild(tdStatus);
+            row.appendChild(tdLink);
+            row.appendChild(tdActions);
+            tbody.appendChild(row);
+          });
+          table.appendChild(tbody);
+          container.appendChild(table);
+        });
+    }
+
+    function stopContainer(enrollmentId, courseId) {
+      showToast('Stopping container...');
+      fetch(API + '/api/enrollments/' + enrollmentId + '/stop', { method: 'POST' })
+        .then(function() {
+          renderEnrollments(courseId);
+          showToast('Container stopped');
+        });
+    }
+
+    function startContainer(enrollmentId, courseId) {
+      showToast('Starting container...');
+      fetch(API + '/api/enrollments/' + enrollmentId + '/start', { method: 'POST' })
+        .then(function() {
+          renderEnrollments(courseId);
+          showToast('Container started');
+        });
+    }
+
+    function syncContainer(enrollmentId, courseId) {
+      showToast('Syncing assignments...');
+      fetch(API + '/api/enrollments/' + enrollmentId + '/sync', { method: 'POST' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast('Sync failed: ' + data.error);
+          } else {
+            showToast('Synced ' + data.count + ' assignments');
+          }
+        });
+    }
+
+    function saveCourse(e) {
+      e.preventDefault();
+      var id = document.getElementById('courseId').value;
+      var data = {
+        name: document.getElementById('courseName').value,
+        description: document.getElementById('courseDescription').value,
+        language: document.getElementById('courseLanguage').value
+      };
+      var method = id ? 'PUT' : 'POST';
+      var url = id ? API + '/api/courses/' + id : API + '/api/courses';
+      fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function() {
+        hideModal('courseModal');
+        document.getElementById('courseForm').reset();
+        document.getElementById('courseId').value = '';
+        document.getElementById('courseModalTitle').textContent = 'New Course';
+        loadCourses();
+        showToast(id ? 'Course updated' : 'Course created');
+      });
+    }
+
+    function showCourseDetail(courseId) {
+      currentCourseId = courseId;
+      var course = courses.find(function(c) { return c.id === courseId; });
+      document.getElementById('detailCourseName').textContent = course.name;
+      document.getElementById('detailCourseMeta').textContent = (course.description || course.language) + ' • Created ' + new Date(course.created_at).toLocaleDateString();
+      document.getElementById('coursesView').style.display = 'none';
+      document.getElementById('courseDetail').classList.add('active');
+      renderEnrollments(courseId);
+      loadAssignments(courseId);
+      renderTemplateSelect();
+    }
+
+    function showCoursesView() {
+      document.getElementById('courseDetail').classList.remove('active');
+      document.getElementById('coursesView').style.display = 'block';
+      currentCourseId = null;
+    }
+
+    function editCurrentCourse() {
+      var course = courses.find(function(c) { return c.id === currentCourseId; });
+      document.getElementById('courseId').value = course.id;
+      document.getElementById('courseName').value = course.name;
+      document.getElementById('courseDescription').value = course.description || '';
+      document.getElementById('courseLanguage').value = course.language;
+      document.getElementById('courseModalTitle').textContent = 'Edit Course';
+      showModal('courseModal');
+    }
+
+    function enrollStudent(e) {
+      e.preventDefault();
+      var existingId = document.getElementById('existingStudentSelect').value;
+      if (existingId) {
+        createEnrollment(parseInt(existingId));
+      } else {
+        var firstName = document.getElementById('studentFirstName').value;
+        var lastName = document.getElementById('studentLastName').value;
+        var email = document.getElementById('studentEmail').value;
+        if (!firstName || !lastName || !email) {
+          showToast('Please fill in all student fields');
+          return;
+        }
+        fetch(API + '/api/students', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ first_name: firstName, last_name: lastName, email: email })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+            return;
+          }
+          loadStudents();
+          createEnrollment(data.id);
+        });
+      }
+    }
+
+    function createEnrollment(studentId) {
+      fetch(API + '/api/courses/' + currentCourseId + '/enrollments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: studentId })
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.error) {
+          showToast(data.error);
+          return;
+        }
+        hideModal('enrollModal');
+        document.getElementById('enrollForm').reset();
+        renderEnrollments(currentCourseId);
+        showToast('Student enrolled');
+      });
+    }
+
+    function removeEnrollment(courseId, enrollmentId) {
+      if (!confirm('Remove this student from the course?')) return;
+      fetch(API + '/api/courses/' + courseId + '/enrollments/' + enrollmentId, { method: 'DELETE' })
+        .then(function() {
+          renderEnrollments(courseId);
+          showToast('Student removed');
+        });
+    }
+
+    function copyAccessLink(token) {
+      var url = window.location.origin + '/access/' + token;
+      navigator.clipboard.writeText(url);
+      showToast('Access link copied!');
+    }
+
+    function saveTemplate(e) {
+      e.preventDefault();
+      var id = document.getElementById('templateId').value;
+      var data = {
+        name: document.getElementById('templateName').value,
+        clipboard_enabled: document.getElementById('templateClipboard').checked,
+        is_exam_mode: document.getElementById('templateExamMode').checked,
+        website_allowlist: document.getElementById('templateAllowlist').value
+      };
+      var method = id ? 'PUT' : 'POST';
+      var url = id ? API + '/api/templates/' + id : API + '/api/templates';
+      fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function() {
+        hideModal('templateModal');
+        document.getElementById('templateForm').reset();
+        document.getElementById('templateId').value = '';
+        document.getElementById('templateModalTitle').textContent = 'New Template';
+        loadTemplates();
+        showToast(id ? 'Template updated' : 'Template created');
+      });
+    }
+
+    function editTemplate(id) {
+      var t = templates.find(function(x) { return x.id === id; });
+      document.getElementById('templateId').value = t.id;
+      document.getElementById('templateName').value = t.name;
+      document.getElementById('templateClipboard').checked = t.clipboard_enabled;
+      document.getElementById('templateExamMode').checked = t.is_exam_mode;
+      document.getElementById('templateAllowlist').value = t.website_allowlist || '';
+      document.getElementById('templateModalTitle').textContent = 'Edit Template';
+      showModal('templateModal');
+    }
+
+    function loadAssignments(courseId) {
+      fetch(API + '/api/courses/' + courseId + '/assignments')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          assignments = data;
+          renderAssignments();
+        });
+    }
+
+    function renderAssignments() {
+      var container = document.getElementById('assignmentsList');
+      if (assignments.length === 0) {
+        container.textContent = '';
+        var empty = document.createElement('div');
+        empty.style.padding = '3rem';
+        empty.style.textAlign = 'center';
+        empty.style.color = 'var(--slate-400)';
+        empty.textContent = 'No assignments yet. Create one to get started!';
+        container.appendChild(empty);
+        return;
+      }
+      container.textContent = '';
+      var table = document.createElement('table');
+      table.className = 'table';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['Title', 'Folder', 'Due Date', 'Template', 'Actions'].forEach(function(h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      assignments.forEach(function(a) {
+        var row = document.createElement('tr');
+        var tdTitle = document.createElement('td');
+        tdTitle.style.fontWeight = '500';
+        if (a.is_exam) {
+          var examBadge = document.createElement('span');
+          examBadge.textContent = 'EXAM';
+          examBadge.style.cssText = 'background: var(--rose-100); color: var(--rose-500); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-right: 0.5rem;';
+          tdTitle.appendChild(examBadge);
+        }
+        var titleText = document.createTextNode(a.title);
+        tdTitle.appendChild(titleText);
+        var tdFolder = document.createElement('td');
+        var folderSpan = document.createElement('code');
+        folderSpan.style.background = 'var(--cream)';
+        folderSpan.style.padding = '0.2rem 0.5rem';
+        folderSpan.style.borderRadius = '4px';
+        folderSpan.style.fontSize = '0.85rem';
+        folderSpan.textContent = a.folder_name;
+        tdFolder.appendChild(folderSpan);
+        var tdDue = document.createElement('td');
+        if (a.is_exam && a.end_time) {
+          tdDue.textContent = new Date(a.end_time).toLocaleString();
+          tdDue.style.color = 'var(--rose-500)';
+          tdDue.style.fontWeight = '500';
+        } else {
+          tdDue.textContent = a.due_date ? new Date(a.due_date).toLocaleDateString() : '-';
+          tdDue.style.color = 'var(--slate-400)';
+        }
+        var tdTemplate = document.createElement('td');
+        tdTemplate.textContent = a.template_name || '-';
+        tdTemplate.style.color = 'var(--slate-400)';
+        var tdActions = document.createElement('td');
+        tdActions.className = 'actions';
+        if (a.is_exam) {
+          var sessionsBtn = document.createElement('button');
+          sessionsBtn.className = 'btn btn-sm';
+          sessionsBtn.style.cssText = 'background: var(--rose-500); color: white;';
+          sessionsBtn.textContent = 'Exam Sessions';
+          sessionsBtn.onclick = function() { showExamSessions(a); };
+          tdActions.appendChild(sessionsBtn);
+        } else {
+          var subsBtn = document.createElement('button');
+          subsBtn.className = 'btn btn-primary btn-sm';
+          subsBtn.textContent = 'Submissions';
+          subsBtn.onclick = function() { showSubmissions(a.id, a.title); };
+          tdActions.appendChild(subsBtn);
+        }
+        var editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-ghost btn-sm';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = function() { editAssignment(a.id); };
+        var deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-ghost btn-sm';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.style.color = 'var(--rose-500)';
+        deleteBtn.onclick = function() { deleteAssignment(a.id); };
+        tdActions.appendChild(editBtn);
+        tdActions.appendChild(deleteBtn);
+        row.appendChild(tdTitle);
+        row.appendChild(tdFolder);
+        row.appendChild(tdDue);
+        row.appendChild(tdTemplate);
+        row.appendChild(tdActions);
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    function renderTemplateSelect() {
+      var select = document.getElementById('assignmentTemplate');
+      select.textContent = '';
+      var opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = '-- No restrictions --';
+      select.appendChild(opt);
+      templates.forEach(function(t) {
+        var opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.name + (t.is_exam_mode ? ' (Exam)' : '');
+        select.appendChild(opt);
+      });
+    }
+
+    function toggleExamFields() {
+      var isExam = document.getElementById('assignmentIsExam').checked;
+      document.getElementById('examFields').style.display = isExam ? 'block' : 'none';
+    }
+
+    function saveAssignment(e) {
+      e.preventDefault();
+      var id = document.getElementById('assignmentId').value;
+      var isExam = document.getElementById('assignmentIsExam').checked;
+      var data = {
+        title: document.getElementById('assignmentTitle').value,
+        folder_name: document.getElementById('assignmentFolder').value.toLowerCase().replace(/[^a-z0-9\-]/g, '-'),
+        instructions_md: document.getElementById('assignmentInstructions').value,
+        due_date: document.getElementById('assignmentDueDate').value || null,
+        restriction_template_id: document.getElementById('assignmentTemplate').value || null,
+        is_exam: isExam,
+        start_time: isExam ? document.getElementById('assignmentStartTime').value || null : null,
+        end_time: isExam ? document.getElementById('assignmentEndTime').value || null : null
+      };
+      var method = id ? 'PUT' : 'POST';
+      var url = id ? API + '/api/assignments/' + id : API + '/api/courses/' + currentCourseId + '/assignments';
+      fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function() {
+        hideModal('assignmentModal');
+        document.getElementById('assignmentForm').reset();
+        document.getElementById('assignmentId').value = '';
+        document.getElementById('assignmentIsExam').checked = false;
+        document.getElementById('examFields').style.display = 'none';
+        document.getElementById('assignmentModalTitle').textContent = 'New Assignment';
+        loadAssignments(currentCourseId);
+        showToast(id ? 'Assignment updated' : 'Assignment created');
+      });
+    }
+
+    function editAssignment(id) {
+      var a = assignments.find(function(x) { return x.id === id; });
+      document.getElementById('assignmentId').value = a.id;
+      document.getElementById('assignmentTitle').value = a.title;
+      document.getElementById('assignmentFolder').value = a.folder_name;
+      document.getElementById('assignmentInstructions').value = a.instructions_md || '';
+      document.getElementById('assignmentDueDate').value = a.due_date ? a.due_date.slice(0, 16) : '';
+      document.getElementById('assignmentTemplate').value = a.restriction_template_id || '';
+      document.getElementById('assignmentIsExam').checked = a.is_exam ? true : false;
+      document.getElementById('assignmentStartTime').value = a.start_time ? a.start_time.slice(0, 16) : '';
+      document.getElementById('assignmentEndTime').value = a.end_time ? a.end_time.slice(0, 16) : '';
+      document.getElementById('examFields').style.display = a.is_exam ? 'block' : 'none';
+      document.getElementById('assignmentModalTitle').textContent = a.is_exam ? 'Edit Exam' : 'Edit Assignment';
+      showModal('assignmentModal');
+    }
+
+    function deleteAssignment(id) {
+      if (!confirm('Delete this assignment? This cannot be undone.')) return;
+      fetch(API + '/api/assignments/' + id, { method: 'DELETE' })
+        .then(function() {
+          loadAssignments(currentCourseId);
+          showToast('Assignment deleted');
+        });
+    }
+
+    function showSubmissions(assignmentId, title) {
+      currentAssignmentId = assignmentId;
+      document.getElementById('submissionsModalTitle').textContent = 'Submissions: ' + title;
+      loadSubmissions(assignmentId);
+      showModal('submissionsModal');
+    }
+
+    function loadSubmissions(assignmentId) {
+      fetch(API + '/api/assignments/' + assignmentId + '/submissions')
+        .then(function(res) { return res.json(); })
+        .then(function(submissions) {
+          renderSubmissions(submissions);
+        });
+    }
+
+    function renderSubmissions(submissions) {
+      var container = document.getElementById('submissionsList');
+      if (submissions.length === 0) {
+        container.textContent = '';
+        var empty = document.createElement('div');
+        empty.style.padding = '3rem';
+        empty.style.textAlign = 'center';
+        empty.style.color = 'var(--slate-400)';
+        empty.textContent = 'No submissions yet';
+        container.appendChild(empty);
+        return;
+      }
+      container.textContent = '';
+      var table = document.createElement('table');
+      table.className = 'table';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['Student', 'Submitted', 'Size', 'Download'].forEach(function(h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      submissions.forEach(function(s) {
+        var row = document.createElement('tr');
+        var tdStudent = document.createElement('td');
+        var nameDiv = document.createElement('div');
+        nameDiv.className = 'student-name';
+        nameDiv.textContent = s.student_name;
+        var emailDiv = document.createElement('div');
+        emailDiv.className = 'student-email';
+        emailDiv.textContent = s.student_email;
+        tdStudent.appendChild(nameDiv);
+        tdStudent.appendChild(emailDiv);
+        var tdTime = document.createElement('td');
+        tdTime.textContent = new Date(s.submitted_at).toLocaleString();
+        tdTime.style.color = 'var(--slate-400)';
+        tdTime.style.fontSize = '0.9rem';
+        var tdSize = document.createElement('td');
+        tdSize.textContent = formatFileSize(s.size);
+        tdSize.style.color = 'var(--slate-400)';
+        var tdDownload = document.createElement('td');
+        var downloadLink = document.createElement('a');
+        downloadLink.href = s.download_url;
+        downloadLink.className = 'btn btn-amber btn-sm';
+        downloadLink.textContent = 'Download';
+        downloadLink.style.textDecoration = 'none';
+        tdDownload.appendChild(downloadLink);
+        row.appendChild(tdStudent);
+        row.appendChild(tdTime);
+        row.appendChild(tdSize);
+        row.appendChild(tdDownload);
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function showExamSessions(assignment) {
+      currentExamAssignment = assignment;
+      document.getElementById('examSessionsModalTitle').textContent = 'Exam: ' + assignment.title;
+
+      // Load both enrollments and exam sessions
+      Promise.all([
+        fetch(API + '/api/courses/' + currentCourseId + '/enrollments').then(function(r) { return r.json(); }),
+        fetch(API + '/api/assignments/' + assignment.id + '/exam-sessions').then(function(r) { return r.json(); })
+      ]).then(function(results) {
+        var enrollments = results[0];
+        var sessions = results[1];
+        renderExamStudents(enrollments, sessions, assignment.id);
+      });
+
+      showModal('examSessionsModal');
+    }
+
+    function renderExamStudents(enrollments, sessions, assignmentId) {
+      var container = document.getElementById('examStudentsList');
+      container.textContent = '';
+
+      if (enrollments.length === 0) {
+        var empty = document.createElement('div');
+        empty.style.padding = '3rem';
+        empty.style.textAlign = 'center';
+        empty.style.color = 'var(--slate-400)';
+        empty.textContent = 'No students enrolled in this course yet.';
+        container.appendChild(empty);
+        return;
+      }
+
+      // Create a map of student_id to session for quick lookup
+      var sessionMap = {};
+      sessions.forEach(function(s) {
+        sessionMap[s.student_id] = s;
+      });
+
+      var table = document.createElement('table');
+      table.className = 'table';
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['Student', 'Exam Link', 'Status', 'Actions'].forEach(function(h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      var tbody = document.createElement('tbody');
+      var baseUrl = window.location.origin + '/exam/' + assignmentId + '/';
+
+      enrollments.forEach(function(e) {
+        var session = sessionMap[e.student_id];
+        var row = document.createElement('tr');
+
+        // Student name/email
+        var tdStudent = document.createElement('td');
+        var nameDiv = document.createElement('div');
+        nameDiv.className = 'student-name';
+        nameDiv.textContent = e.first_name + ' ' + e.last_name;
+        var emailDiv = document.createElement('div');
+        emailDiv.className = 'student-email';
+        emailDiv.textContent = e.email;
+        tdStudent.appendChild(nameDiv);
+        tdStudent.appendChild(emailDiv);
+
+        // Exam link with copy button
+        var tdLink = document.createElement('td');
+        var linkContainer = document.createElement('div');
+        linkContainer.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
+        var linkInput = document.createElement('input');
+        linkInput.type = 'text';
+        linkInput.readOnly = true;
+        linkInput.value = baseUrl + e.access_token;
+        linkInput.style.cssText = 'font-family: monospace; font-size: 0.75rem; padding: 0.3rem 0.5rem; border: 1px solid var(--cream-dark); border-radius: 4px; width: 220px; background: var(--cream);';
+        linkInput.id = 'examLink_' + e.student_id;
+        var copyBtn = document.createElement('button');
+        copyBtn.className = 'btn btn-amber btn-sm';
+        copyBtn.textContent = 'Copy';
+        copyBtn.onclick = (function(studentId, studentName) {
+          return function() { copyStudentExamLink(studentId, studentName); };
+        })(e.student_id, e.first_name);
+        linkContainer.appendChild(linkInput);
+        linkContainer.appendChild(copyBtn);
+        tdLink.appendChild(linkContainer);
+
+        // Status
+        var tdStatus = document.createElement('td');
+        var statusBadge = document.createElement('span');
+        if (!session) {
+          statusBadge.textContent = 'NOT STARTED';
+          statusBadge.style.cssText = 'background: var(--slate-100); color: var(--slate-500); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;';
+        } else if (session.status === 'active') {
+          statusBadge.textContent = 'IN PROGRESS';
+          statusBadge.style.cssText = 'background: var(--emerald-100); color: var(--emerald-600); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;';
+        } else if (session.status === 'completed') {
+          statusBadge.textContent = 'COMPLETED';
+          statusBadge.style.cssText = 'background: var(--amber-100); color: var(--amber-600); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600;';
+        }
+        tdStatus.appendChild(statusBadge);
+        if (session && session.started_at) {
+          var timeDiv = document.createElement('div');
+          timeDiv.style.cssText = 'font-size: 0.75rem; color: var(--slate-400); margin-top: 0.25rem;';
+          timeDiv.textContent = 'Started: ' + new Date(session.started_at).toLocaleTimeString();
+          tdStatus.appendChild(timeDiv);
+        }
+
+        // Actions
+        var tdActions = document.createElement('td');
+        if (session && session.status === 'active') {
+          var endBtn = document.createElement('button');
+          endBtn.className = 'btn btn-sm';
+          endBtn.style.cssText = 'background: var(--rose-500); color: white;';
+          endBtn.textContent = 'End Exam';
+          endBtn.onclick = (function(sessionId) {
+            return function() { endExamSession(sessionId); };
+          })(session.id);
+          tdActions.appendChild(endBtn);
+        } else if (session && session.status === 'completed' && session.ended_at) {
+          tdActions.textContent = 'Ended: ' + new Date(session.ended_at).toLocaleTimeString();
+          tdActions.style.cssText = 'color: var(--slate-400); font-size: 0.85rem;';
+        } else {
+          tdActions.textContent = '-';
+          tdActions.style.color = 'var(--slate-300)';
+        }
+
+        row.appendChild(tdStudent);
+        row.appendChild(tdLink);
+        row.appendChild(tdStatus);
+        row.appendChild(tdActions);
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    function endExamSession(sessionId) {
+      if (!confirm('End this exam session? The student will lose access immediately.')) return;
+      fetch(API + '/api/exam-sessions/' + sessionId + '/end', { method: 'POST' })
+        .then(function() {
+          showExamSessions(currentExamAssignment);
+          showToast('Exam session ended');
+        });
+    }
+
+    function copyStudentExamLink(studentId, studentName) {
+      var input = document.getElementById('examLink_' + studentId);
+      input.select();
+      document.execCommand('copy');
+      showToast('Exam link for ' + studentName + ' copied!');
+    }
+
+    // User info and auth
+    var currentUser = null;
+
+    function loadUserInfo() {
+      fetch(API + '/api/me')
+        .then(function(res) {
+          if (!res.ok) {
+            window.location.href = '/login';
+            return null;
+          }
+          return res.json();
+        })
+        .then(function(user) {
+          if (!user) return;
+          currentUser = user;
+          document.getElementById('userName').textContent = user.name || user.email;
+          var roleEl = document.getElementById('userRole');
+          roleEl.textContent = user.role;
+          if (user.role === 'admin') {
+            roleEl.classList.add('admin');
+            document.getElementById('settingsTab').style.display = 'inline-block';
+          }
+        })
+        .catch(function() {
+          window.location.href = '/login';
+        });
+    }
+
+    function logout() {
+      fetch(API + '/api/logout', { method: 'POST' })
+        .then(function() {
+          window.location.href = '/';
+        })
+        .catch(function() {
+          window.location.href = '/';
+        });
+    }
+
+    // Handle settings tab navigation
+    document.getElementById('settingsTab').addEventListener('click', function() {
+      window.location.href = '/settings.html';
+    });
+
+    // Initialize
+    loadUserInfo();
+    loadCourses();
+    loadStudents();
+    loadTemplates();
+  </script>
+</body>
+</html>

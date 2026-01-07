@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Settings - SecureExam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-900: #0a1628;
+      --navy-800: #121f36;
+      --navy-700: #1a2d4d;
+      --navy-600: #243a5e;
+      --slate-400: #8b9bb4;
+      --slate-300: #a8b5c9;
+      --cream: #f8f6f3;
+      --cream-dark: #e8e4df;
+      --amber-500: #d4a853;
+      --amber-400: #e6bc6a;
+      --amber-300: #f0d08a;
+      --emerald-500: #2d8a6e;
+      --rose-500: #c45c5c;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Work Sans', -apple-system, sans-serif;
+      --shadow-soft: 0 4px 20px rgba(10, 22, 40, 0.08);
+      --shadow-medium: 0 8px 30px rgba(10, 22, 40, 0.12);
+      --shadow-elevated: 0 20px 50px rgba(10, 22, 40, 0.18);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background: var(--cream);
+      color: var(--navy-900);
+      min-height: 100vh;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+    .header {
+      background: var(--navy-900);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo-mark {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--amber-500), var(--amber-400));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--cream);
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .nav-tab {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--slate-300);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+    }
+    .nav-tab:hover { background: var(--navy-700); color: var(--cream); }
+    .nav-tab.active { background: var(--amber-500); color: var(--navy-900); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--slate-300);
+      font-size: 0.9rem;
+    }
+    .user-name {
+      color: var(--cream);
+      font-weight: 500;
+    }
+    .user-role {
+      background: var(--navy-700);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .user-role.admin {
+      background: var(--amber-500);
+      color: var(--navy-900);
+    }
+    .btn-logout {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--slate-300);
+      background: transparent;
+      border: 1px solid var(--navy-600);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .btn-logout:hover {
+      background: var(--navy-700);
+      color: var(--cream);
+      border-color: var(--navy-500);
+    }
+    .main { max-width: 1200px; margin: 0 auto; padding: 2.5rem; }
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+    .page-subtitle { font-size: 1rem; color: var(--slate-400); margin-top: 0.3rem; }
+    .section {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 2rem;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--cream);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label {
+      font-weight: 500;
+      color: var(--navy-800);
+    }
+    .setting-description {
+      font-size: 0.85rem;
+      color: var(--slate-400);
+      margin-top: 0.25rem;
+    }
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 28px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--cream-dark);
+      transition: var(--transition-smooth);
+      border-radius: 28px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: var(--transition-smooth);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .toggle input:checked + .toggle-slider {
+      background-color: var(--emerald-500);
+    }
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+    .table-container { overflow: hidden; border-radius: var(--radius-sm); }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th {
+      text-align: left;
+      padding: 1rem 1.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--slate-400);
+      background: var(--cream);
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--cream-dark); }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover td { background: var(--cream); }
+    .professor-name { font-weight: 500; color: var(--navy-900); }
+    .professor-email { font-size: 0.85rem; color: var(--slate-400); }
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .status-badge.active {
+      background: rgba(45, 138, 110, 0.1);
+      color: var(--emerald-500);
+    }
+    .status-badge.waitlist {
+      background: rgba(212, 168, 83, 0.2);
+      color: var(--amber-500);
+    }
+    .status-badge.disabled {
+      background: rgba(139, 155, 180, 0.15);
+      color: var(--slate-400);
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .role-badge.admin {
+      background: var(--amber-500);
+      color: var(--navy-900);
+    }
+    .role-badge.professor {
+      background: var(--navy-800);
+      color: var(--cream);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .btn-primary { background: var(--navy-800); color: var(--cream); }
+    .btn-primary:hover { background: var(--navy-700); }
+    .btn-amber { background: linear-gradient(135deg, var(--amber-500), var(--amber-400)); color: var(--navy-900); }
+    .btn-amber:hover { transform: translateY(-1px); }
+    .btn-ghost { background: transparent; color: var(--navy-700); border: 1px solid var(--cream-dark); }
+    .btn-ghost:hover { background: var(--cream-dark); }
+    .btn-success { background: var(--emerald-500); color: white; }
+    .btn-success:hover { opacity: 0.9; }
+    .btn-danger { background: var(--rose-500); color: white; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+    .actions { display: flex; gap: 0.5rem; }
+    .toast {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      padding: 1rem 1.5rem;
+      background: var(--navy-800);
+      color: var(--cream);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-elevated);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: var(--transition-smooth);
+      z-index: 300;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--slate-400);
+    }
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-soft);
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--slate-400);
+      margin-top: 0.25rem;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .filter-tab {
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      background: var(--cream);
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .filter-tab:hover { background: var(--cream-dark); }
+    .filter-tab.active {
+      background: var(--navy-800);
+      color: var(--cream);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark">S</div>
+      <span class="logo-text">SecureExam</span>
+    </div>
+    <nav class="nav-tabs">
+      <a href="/professor.html" class="nav-tab">Courses</a>
+      <a href="/professor.html" class="nav-tab">Templates</a>
+      <span class="nav-tab active">Settings</span>
+    </nav>
+    <div class="header-right">
+      <div class="user-info">
+        <span class="user-name" id="userName">Loading...</span>
+        <span class="user-role admin" id="userRole">admin</span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Admin Settings</h1>
+        <p class="page-subtitle">Manage professors, system settings, and access controls</p>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-value" id="totalProfessors">-</div>
+        <div class="stat-label">Total Professors</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeProfessors">-</div>
+        <div class="stat-label">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="waitlistProfessors">-</div>
+        <div class="stat-label">Waitlist</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="adminCount">-</div>
+        <div class="stat-label">Admins</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">System Settings</h2>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Waitlist Mode</div>
+          <div class="setting-description">When enabled, new professor signups will be placed on a waitlist pending approval</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="waitlistMode" onchange="toggleWaitlist()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Professor Management</h2>
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="active">Active</button>
+        <button class="filter-tab" data-filter="waitlist">Waitlist</button>
+        <button class="filter-tab" data-filter="disabled">Disabled</button>
+      </div>
+      <div id="professorsList" class="table-container"></div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    var API = '';
+    var professors = [];
+    var currentFilter = 'all';
+    var currentUser = null;
+
+    // Filter tabs
+    document.querySelectorAll('.filter-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        renderProfessors();
+      });
+    });
+
+    function showToast(message) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
+
+    function loadUserInfo() {
+      fetch(API + '/api/me')
+        .then(function(res) {
+          if (!res.ok) {
+            window.location.href = '/login';
+            return null;
+          }
+          return res.json();
+        })
+        .then(function(user) {
+          if (!user) return;
+          if (user.role !== 'admin') {
+            window.location.href = '/professor.html';
+            return;
+          }
+          currentUser = user;
+          document.getElementById('userName').textContent = user.name || user.email;
+        })
+        .catch(function() {
+          window.location.href = '/login';
+        });
+    }
+
+    function logout() {
+      fetch(API + '/api/logout', { method: 'POST' })
+        .then(function() {
+          window.location.href = '/';
+        });
+    }
+
+    function loadSettings() {
+      fetch(API + '/api/settings')
+        .then(function(res) { return res.json(); })
+        .then(function(settings) {
+          document.getElementById('waitlistMode').checked = settings.waitlist_enabled === 'true';
+        });
+    }
+
+    function toggleWaitlist() {
+      var enabled = document.getElementById('waitlistMode').checked;
+      fetch(API + '/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ waitlist_enabled: enabled ? 'true' : 'false' })
+      })
+        .then(function() {
+          showToast('Waitlist mode ' + (enabled ? 'enabled' : 'disabled'));
+        });
+    }
+
+    function loadProfessors() {
+      fetch(API + '/api/professors')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          professors = data;
+          updateStats();
+          renderProfessors();
+        });
+    }
+
+    function updateStats() {
+      var total = professors.length;
+      var active = professors.filter(function(p) { return p.status === 'active'; }).length;
+      var waitlist = professors.filter(function(p) { return p.status === 'waitlist'; }).length;
+      var admins = professors.filter(function(p) { return p.role === 'admin'; }).length;
+
+      document.getElementById('totalProfessors').textContent = total;
+      document.getElementById('activeProfessors').textContent = active;
+      document.getElementById('waitlistProfessors').textContent = waitlist;
+      document.getElementById('adminCount').textContent = admins;
+    }
+
+    function renderProfessors() {
+      var container = document.getElementById('professorsList');
+      var filtered = currentFilter === 'all' ? professors : professors.filter(function(p) {
+        return p.status === currentFilter;
+      });
+
+      container.textContent = '';
+
+      if (filtered.length === 0) {
+        var empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'No professors found';
+        container.appendChild(empty);
+        return;
+      }
+
+      var table = document.createElement('table');
+      table.className = 'table';
+
+      var thead = document.createElement('thead');
+      var headRow = document.createElement('tr');
+      ['Professor', 'Status', 'Role', 'Joined', 'Actions'].forEach(function(h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      var tbody = document.createElement('tbody');
+
+      filtered.forEach(function(p) {
+        var row = document.createElement('tr');
+
+        // Professor name/email cell
+        var tdProf = document.createElement('td');
+        var nameDiv = document.createElement('div');
+        nameDiv.className = 'professor-name';
+        nameDiv.textContent = p.name || 'Unnamed';
+        var emailDiv = document.createElement('div');
+        emailDiv.className = 'professor-email';
+        emailDiv.textContent = p.email;
+        tdProf.appendChild(nameDiv);
+        tdProf.appendChild(emailDiv);
+
+        // Status cell
+        var tdStatus = document.createElement('td');
+        var statusBadge = document.createElement('span');
+        statusBadge.className = 'status-badge ' + p.status;
+        statusBadge.textContent = p.status;
+        tdStatus.appendChild(statusBadge);
+
+        // Role cell
+        var tdRole = document.createElement('td');
+        var roleBadge = document.createElement('span');
+        roleBadge.className = 'role-badge ' + p.role;
+        roleBadge.textContent = p.role;
+        tdRole.appendChild(roleBadge);
+
+        // Joined cell
+        var tdJoined = document.createElement('td');
+        tdJoined.style.cssText = 'color: var(--slate-400); font-size: 0.85rem;';
+        tdJoined.textContent = new Date(p.created_at).toLocaleDateString();
+
+        // Actions cell
+        var tdActions = document.createElement('td');
+        tdActions.className = 'actions';
+
+        if (p.status === 'waitlist') {
+          var approveBtn = document.createElement('button');
+          approveBtn.className = 'btn btn-success btn-sm';
+          approveBtn.textContent = 'Approve';
+          approveBtn.onclick = function() { approveProfessor(p.id); };
+          tdActions.appendChild(approveBtn);
+
+          var denyBtn = document.createElement('button');
+          denyBtn.className = 'btn btn-danger btn-sm';
+          denyBtn.textContent = 'Deny';
+          denyBtn.onclick = function() { denyProfessor(p.id); };
+          tdActions.appendChild(denyBtn);
+        } else if (p.status === 'active') {
+          if (p.role !== 'admin') {
+            var promoteBtn = document.createElement('button');
+            promoteBtn.className = 'btn btn-amber btn-sm';
+            promoteBtn.textContent = 'Make Admin';
+            promoteBtn.onclick = function() { promoteProfessor(p.id); };
+            tdActions.appendChild(promoteBtn);
+          } else {
+            var demoteBtn = document.createElement('button');
+            demoteBtn.className = 'btn btn-ghost btn-sm';
+            demoteBtn.textContent = 'Remove Admin';
+            demoteBtn.onclick = function() { demoteProfessor(p.id); };
+            tdActions.appendChild(demoteBtn);
+          }
+
+          var disableBtn = document.createElement('button');
+          disableBtn.className = 'btn btn-ghost btn-sm';
+          disableBtn.style.color = 'var(--rose-500)';
+          disableBtn.textContent = 'Disable';
+          disableBtn.onclick = function() { disableProfessor(p.id); };
+          tdActions.appendChild(disableBtn);
+        } else if (p.status === 'disabled') {
+          var enableBtn = document.createElement('button');
+          enableBtn.className = 'btn btn-success btn-sm';
+          enableBtn.textContent = 'Enable';
+          enableBtn.onclick = function() { enableProfessor(p.id); };
+          tdActions.appendChild(enableBtn);
+
+          var deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn btn-danger btn-sm';
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.onclick = function() { deleteProfessor(p.id); };
+          tdActions.appendChild(deleteBtn);
+        }
+
+        row.appendChild(tdProf);
+        row.appendChild(tdStatus);
+        row.appendChild(tdRole);
+        row.appendChild(tdJoined);
+        row.appendChild(tdActions);
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    function approveProfessor(id) {
+      fetch(API + '/api/professors/' + id + '/approve', { method: 'POST' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Professor approved');
+            loadProfessors();
+          }
+        });
+    }
+
+    function denyProfessor(id) {
+      if (!confirm('Deny this professor? They will be removed from the waitlist.')) return;
+      fetch(API + '/api/professors/' + id, { method: 'DELETE' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Professor denied and removed');
+            loadProfessors();
+          }
+        });
+    }
+
+    function promoteProfessor(id) {
+      if (!confirm('Promote this professor to admin? They will have full system access.')) return;
+      fetch(API + '/api/professors/' + id + '/promote', { method: 'POST' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Professor promoted to admin');
+            loadProfessors();
+          }
+        });
+    }
+
+    function demoteProfessor(id) {
+      if (!confirm('Remove admin privileges from this professor?')) return;
+      fetch(API + '/api/professors/' + id + '/demote', { method: 'POST' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Admin privileges removed');
+            loadProfessors();
+          }
+        });
+    }
+
+    function disableProfessor(id) {
+      if (!confirm('Disable this professor? They will not be able to log in.')) return;
+      fetch(API + '/api/professors/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'disabled' })
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Professor disabled');
+            loadProfessors();
+          }
+        });
+    }
+
+    function enableProfessor(id) {
+      fetch(API + '/api/professors/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'active' })
+      })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Professor enabled');
+            loadProfessors();
+          }
+        });
+    }
+
+    function deleteProfessor(id) {
+      if (!confirm('Permanently delete this professor? This cannot be undone.')) return;
+      fetch(API + '/api/professors/' + id, { method: 'DELETE' })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.error) {
+            showToast(data.error);
+          } else {
+            showToast('Professor deleted');
+            loadProfessors();
+          }
+        });
+    }
+
+    // Initialize
+    loadUserInfo();
+    loadSettings();
+    loadProfessors();
+  </script>
+</body>
+</html>

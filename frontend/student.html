@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coding Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-deep: #0a0e14;
+      --bg-surface: #12171f;
+      --bg-elevated: #1a2028;
+      --text-primary: #e6edf3;
+      --text-secondary: #7d8590;
+      --text-muted: #484f58;
+      --accent: #58a6ff;
+      --accent-glow: rgba(88, 166, 255, 0.15);
+      --success: #3fb950;
+      --border: rgba(255, 255, 255, 0.08);
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-body: 'Source Sans 3', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-deep);
+      z-index: 1000;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-content {
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .course-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+    }
+
+    .course-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .loader-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 40px;
+    }
+
+    .loader-ring {
+      position: absolute;
+      inset: 0;
+      border: 2px solid transparent;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+    }
+
+    .loader-ring:nth-child(2) {
+      inset: 10px;
+      border-top-color: transparent;
+      border-right-color: var(--accent);
+      animation-duration: 1.8s;
+      animation-direction: reverse;
+      opacity: 0.6;
+    }
+
+    .loader-ring:nth-child(3) {
+      inset: 20px;
+      border-top-color: var(--accent);
+      border-right-color: transparent;
+      animation-duration: 2.4s;
+      opacity: 0.3;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loader-icon {
+      position: absolute;
+      inset: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-surface);
+      border-radius: 50%;
+    }
+
+    .loader-icon svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+    }
+
+    .loading-title {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .loading-status {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: color 0.3s ease;
+    }
+
+    .step.active {
+      color: var(--text-secondary);
+    }
+
+    .step.complete {
+      color: var(--success);
+    }
+
+    .step-indicator {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      font-size: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .step.active .step-indicator {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .step.complete .step-indicator {
+      border-color: var(--success);
+      background: rgba(63, 185, 80, 0.15);
+    }
+
+    /* VNC Container */
+    .vnc-container {
+      position: fixed;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .vnc-container.visible {
+      opacity: 1;
+    }
+
+    .vnc-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: var(--bg-deep);
+    }
+
+    /* Floating Header */
+    .floating-header {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px;
+      background: rgba(18, 23, 31, 0.9);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .floating-header.visible {
+      opacity: 1;
+    }
+
+    .floating-header:hover {
+      background: rgba(18, 23, 31, 0.95);
+    }
+
+    .header-course {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--success);
+    }
+
+    .header-status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .header-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .header-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .header-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Error State */
+    .error-screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-deep);
+      z-index: 1000;
+    }
+
+    .error-screen.visible {
+      display: flex;
+    }
+
+    .error-icon {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(248, 81, 73, 0.1);
+      border-radius: 50%;
+      margin-bottom: 24px;
+    }
+
+    .error-icon svg {
+      width: 32px;
+      height: 32px;
+      color: #f85149;
+    }
+
+    .error-title {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .error-message {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--bg-deep);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .retry-btn:hover {
+      background: #79b8ff;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <div class="course-badge" id="courseBadge">Loading...</div>
+
+      <div class="loader-container">
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        <div class="loader-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="loading-title">Starting Your Environment</h1>
+      <p class="loading-status" id="loadingStatus">Initializing...</p>
+
+      <div class="loading-steps">
+        <div class="step" id="step1">
+          <span class="step-indicator">1</span>
+          <span>Creating workspace</span>
+        </div>
+        <div class="step" id="step2">
+          <span class="step-indicator">2</span>
+          <span>Starting container</span>
+        </div>
+        <div class="step" id="step3">
+          <span class="step-indicator">3</span>
+          <span>Connecting to desktop</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Screen -->
+  <div class="error-screen" id="errorScreen">
+    <div class="error-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <h2 class="error-title">Connection Failed</h2>
+    <p class="error-message" id="errorMessage">Unable to connect to your coding environment. Please try again or contact your instructor.</p>
+    <button class="retry-btn" onclick="location.reload()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Try Again
+    </button>
+  </div>
+
+  <!-- VNC Container -->
+  <div class="vnc-container" id="vncContainer">
+    <iframe class="vnc-frame" id="vncFrame"></iframe>
+  </div>
+
+  <!-- Floating Header -->
+  <div class="floating-header" id="floatingHeader">
+    <span class="header-course" id="headerCourse">Course</span>
+    <span class="header-status">Connected</span>
+    <div class="header-divider"></div>
+    <button class="header-btn" title="Fullscreen" onclick="toggleFullscreen()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+      </svg>
+    </button>
+    <button class="header-btn" title="Back to Portal" onclick="window.location.href='/professor.html'">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // Parse URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session');
+    const courseName = params.get('course') || 'Coding Lab';
+
+    // Update UI with course name
+    document.getElementById('courseBadge').textContent = courseName;
+    document.getElementById('headerCourse').textContent = courseName;
+    document.title = courseName + ' - Coding Lab';
+
+    // Step tracking
+    function setStep(stepNum, status) {
+      for (let i = 1; i <= 3; i++) {
+        const step = document.getElementById('step' + i);
+        const indicator = step.querySelector('.step-indicator');
+        step.classList.remove('active', 'complete');
+        if (i < stepNum) {
+          step.classList.add('complete');
+          indicator.textContent = '\u2713'; // Unicode checkmark
+        } else if (i === stepNum) {
+          step.classList.add('active');
+          indicator.textContent = String(i);
+        } else {
+          indicator.textContent = String(i);
+        }
+      }
+    }
+
+    function setStatus(message) {
+      document.getElementById('loadingStatus').textContent = message;
+    }
+
+    function showError(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('errorScreen').classList.add('visible');
+    }
+
+    function showVNC() {
+      const wsPath = 'vnc/' + sessionId + '/websockify';
+      const vncUrl = '/vnc/' + sessionId + '/vnc.html?autoconnect=true&resize=scale&password=student&path=' + wsPath;
+      document.getElementById('vncFrame').src = vncUrl;
+
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('vncContainer').classList.add('visible');
+
+      setTimeout(function() {
+        document.getElementById('floatingHeader').classList.add('visible');
+      }, 500);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Readiness polling
+    async function pollReady() {
+      if (!sessionId) {
+        showError('No session specified. Please use the access link provided by your instructor.');
+        return;
+      }
+
+      setStep(1, 'complete');
+      setStatus('Workspace created');
+
+      await new Promise(function(r) { setTimeout(r, 500); });
+      setStep(2, 'active');
+      setStatus('Starting container...');
+
+      let attempts = 0;
+      const maxAttempts = 60; // 60 seconds timeout
+
+      const checkReady = async function() {
+        attempts++;
+
+        try {
+          const response = await fetch('/api/sessions/' + sessionId + '/status');
+          const data = await response.json();
+
+          if (data.status === 'ready') {
+            setStep(2, 'complete');
+            setStep(3, 'active');
+            setStatus('Connecting to desktop...');
+
+            await new Promise(function(r) { setTimeout(r, 500); });
+            setStep(3, 'complete');
+            setStatus('Connected!');
+
+            await new Promise(function(r) { setTimeout(r, 300); });
+            showVNC();
+            return;
+          }
+        } catch (err) {
+          console.log('Waiting for container...', err.message);
+        }
+
+        if (attempts >= maxAttempts) {
+          showError('Timed out waiting for your environment to start. Please try again or contact your instructor.');
+          return;
+        }
+
+        // Update status message periodically
+        if (attempts % 10 === 0) {
+          setStatus('Starting container... (' + attempts + 's)');
+        }
+
+        setTimeout(checkReady, 1000);
+      };
+
+      checkReady();
+    }
+
+    // Start polling when page loads
+    pollReady();
+  </script>
+</body>
+</html>

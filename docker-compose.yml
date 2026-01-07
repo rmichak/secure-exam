@@ -1,0 +1,21 @@
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./frontend:/frontend
+      - ./data:/data
+    networks:
+      - vnc-internal
+    environment:
+      - DOCKER_NETWORK=secure-exam_vnc-internal
+      - DATA_DIR=/data
+      - HOST_DATA_DIR=/Users/randymichak/Desktop/secure-exam/data
+
+networks:
+  vnc-internal:
+    driver: bridge

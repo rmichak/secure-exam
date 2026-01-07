@@ -1,0 +1,26 @@
+# Website Allowlist Configuration
+# ================================
+# One domain per line. Subdomains are automatically included.
+# Lines starting with # are comments.
+#
+# Example: "python.org" allows both "python.org" and "docs.python.org"
+
+# Documentation sites
+docs.python.org
+python.org
+developer.mozilla.org
+mdn.mozilla.org
+
+# Programming resources
+stackoverflow.com
+stackexchange.com
+
+# Package repositories
+pypi.org
+readthedocs.io
+readthedocs.org
+
+# Example allowed site (from user requirement)
+microsoft.com
+
+# Add your allowed domains below:

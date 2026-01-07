@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - SecureExam Desktop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-900: #0a1628;
+      --navy-800: #121f36;
+      --navy-700: #1a2d4d;
+      --navy-600: #243a5e;
+      --slate-400: #8b9bb4;
+      --slate-300: #a8b5c9;
+      --cream: #f8f6f3;
+      --cream-dark: #e8e4df;
+      --amber-500: #d4a853;
+      --amber-400: #e6bc6a;
+      --amber-300: #f0d08a;
+      --rose-500: #c45c5c;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Work Sans', -apple-system, sans-serif;
+      --shadow-soft: 0 4px 20px rgba(10, 22, 40, 0.08);
+      --shadow-medium: 0 8px 30px rgba(10, 22, 40, 0.12);
+      --shadow-elevated: 0 20px 50px rgba(10, 22, 40, 0.18);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      background: var(--navy-900);
+      color: var(--navy-900);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(212, 168, 83, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(212, 168, 83, 0.08) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--slate-300);
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      transition: var(--transition-smooth);
+    }
+    .back-link:hover {
+      color: var(--amber-400);
+    }
+    .back-link svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      box-shadow: var(--shadow-elevated);
+      position: relative;
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--amber-500), var(--amber-300));
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .logo-mark {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--amber-500), var(--amber-400));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--navy-900);
+    }
+    .login-title {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--navy-900);
+      margin-bottom: 0.5rem;
+    }
+    .login-subtitle {
+      color: var(--slate-400);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--navy-700);
+      margin-bottom: 0.5rem;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: var(--navy-900);
+      background: var(--cream);
+      border: 2px solid var(--cream-dark);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+    .form-input::placeholder {
+      color: var(--slate-400);
+    }
+    .form-input:focus {
+      border-color: var(--amber-500);
+      background: white;
+    }
+
+    .error-message {
+      background: rgba(196, 92, 92, 0.1);
+      border: 1px solid rgba(196, 92, 92, 0.3);
+      color: var(--rose-500);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+    }
+    .btn-amber {
+      background: linear-gradient(135deg, var(--amber-500), var(--amber-400));
+      color: var(--navy-900);
+    }
+    .btn-amber:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(212, 168, 83, 0.35);
+    }
+    .btn-amber:active {
+      transform: translateY(0);
+    }
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .signup-link {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--slate-400);
+    }
+    .signup-link a {
+      color: var(--amber-500);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+
+    .demo-hint {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--cream-dark);
+      text-align: center;
+    }
+    .demo-hint-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--navy-700);
+      margin-bottom: 0.5rem;
+    }
+    .demo-hint-text {
+      font-size: 0.85rem;
+      color: var(--slate-400);
+    }
+    .demo-hint code {
+      background: var(--cream);
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: monospace;
+      color: var(--navy-700);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .login-container {
+      animation: fadeUp 0.5s ease-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake {
+      animation: shake 0.4s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to home
+    </a>
+
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">
+          <div class="logo-mark">S</div>
+          <span class="logo-text">SecureExam</span>
+        </div>
+        <h1 class="login-title">Professor Login</h1>
+        <p class="login-subtitle">Sign in to manage your courses and exams</p>
+      </div>
+
+      <div id="errorMessage" class="error-message"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-input"
+            placeholder="you@university.edu"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-input"
+            placeholder="Enter your password"
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-amber">
+          Sign In
+        </button>
+      </form>
+
+      <p class="signup-link">
+        Don't have an account? <a href="/signup">Sign up</a>
+      </p>
+
+      <div class="demo-hint">
+        <p class="demo-hint-title">Demo Account</p>
+        <p class="demo-hint-text">
+          Email: <code>demo@example.com</code><br>
+          Password: <code>demo123</code>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    const loginCard = document.querySelector('.login-card');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      // Clear previous error
+      errorMessage.classList.remove('show');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in...';
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Redirect to professor dashboard
+          window.location.href = '/professor.html';
+        } else {
+          // Show error
+          errorMessage.textContent = data.error || 'Invalid email or password';
+          errorMessage.classList.add('show');
+          loginCard.classList.add('shake');
+          setTimeout(() => loginCard.classList.remove('shake'), 400);
+        }
+      } catch (err) {
+        errorMessage.textContent = 'Network error. Please try again.';
+        errorMessage.classList.add('show');
+        loginCard.classList.add('shake');
+        setTimeout(() => loginCard.classList.remove('shake'), 400);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>

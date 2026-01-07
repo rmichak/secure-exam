@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam in Progress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-deep: #0d0a14;
+      --bg-surface: #1a1520;
+      --bg-elevated: #251e2a;
+      --text-primary: #f3e6ef;
+      --text-secondary: #9085a0;
+      --text-muted: #584f68;
+      --accent: #e74c3c;
+      --accent-glow: rgba(231, 76, 60, 0.15);
+      --warning: #f39c12;
+      --success: #27ae60;
+      --border: rgba(255, 255, 255, 0.08);
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-body: 'Source Sans 3', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-deep);
+      z-index: 1000;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-content {
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .exam-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 48px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .loader-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 40px;
+    }
+
+    .loader-ring {
+      position: absolute;
+      inset: 0;
+      border: 2px solid transparent;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+    }
+
+    .loader-ring:nth-child(2) {
+      inset: 10px;
+      border-top-color: transparent;
+      border-right-color: var(--accent);
+      animation-duration: 1.8s;
+      animation-direction: reverse;
+      opacity: 0.6;
+    }
+
+    .loader-ring:nth-child(3) {
+      inset: 20px;
+      border-top-color: var(--accent);
+      animation-duration: 2.4s;
+      opacity: 0.3;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loader-icon {
+      position: absolute;
+      inset: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-surface);
+      border-radius: 50%;
+    }
+
+    .loader-icon svg {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+    }
+
+    .loading-title {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .loading-status {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: color 0.3s ease;
+    }
+
+    .step.active { color: var(--text-secondary); }
+    .step.complete { color: var(--success); }
+
+    .step-indicator {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      font-size: 10px;
+    }
+
+    .step.active .step-indicator {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .step.complete .step-indicator {
+      border-color: var(--success);
+      background: rgba(39, 174, 96, 0.15);
+    }
+
+    .vnc-container {
+      position: fixed;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .vnc-container.visible {
+      opacity: 1;
+    }
+
+    .vnc-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: var(--bg-deep);
+    }
+
+    .floating-header {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px;
+      background: rgba(26, 21, 32, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      z-index: 100;
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(231, 76, 60, 0.2);
+    }
+
+    .floating-header.visible {
+      opacity: 1;
+    }
+
+    .header-exam {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .timer {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .timer.warning {
+      color: var(--warning);
+      animation: pulse-warning 1s infinite;
+    }
+
+    .timer.critical {
+      color: var(--accent);
+      animation: pulse-critical 0.5s infinite;
+    }
+
+    @keyframes pulse-warning {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    @keyframes pulse-critical {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+
+    .header-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .header-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .header-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .error-screen {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-deep);
+      z-index: 1000;
+    }
+
+    .error-screen.visible {
+      display: flex;
+    }
+
+    .error-icon {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(248, 81, 73, 0.1);
+      border-radius: 50%;
+      margin-bottom: 24px;
+    }
+
+    .error-icon svg {
+      width: 32px;
+      height: 32px;
+      color: #f85149;
+    }
+
+    .error-title {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .error-message {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .retry-btn:hover {
+      background: #c0392b;
+      transform: translateY(-1px);
+    }
+
+    .time-ended {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(13, 10, 20, 0.98);
+      z-index: 2000;
+    }
+
+    .time-ended.visible {
+      display: flex;
+    }
+
+    .time-ended h2 {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .time-ended p {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+      <div class="exam-badge" id="examBadge">Exam Mode</div>
+
+      <div class="loader-container">
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        <div class="loader-ring"></div>
+        <div class="loader-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+
+      <h1 class="loading-title">Preparing Exam Environment</h1>
+      <p class="loading-status" id="loadingStatus">Initializing secure workspace...</p>
+
+      <div class="loading-steps">
+        <div class="step" id="step1">
+          <span class="step-indicator">1</span>
+          <span>Creating isolated workspace</span>
+        </div>
+        <div class="step" id="step2">
+          <span class="step-indicator">2</span>
+          <span>Starting exam container</span>
+        </div>
+        <div class="step" id="step3">
+          <span class="step-indicator">3</span>
+          <span>Connecting to exam desktop</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-screen" id="errorScreen">
+    <div class="error-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <h2 class="error-title">Exam Access Failed</h2>
+    <p class="error-message" id="errorMessage">Unable to start the exam. Please contact your instructor.</p>
+    <button class="retry-btn" onclick="location.reload()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Try Again
+    </button>
+  </div>
+
+  <div class="time-ended" id="timeEnded">
+    <h2>Time's Up!</h2>
+    <p>Your exam session has ended. Your work has been saved.</p>
+  </div>
+
+  <div class="vnc-container" id="vncContainer">
+    <iframe class="vnc-frame" id="vncFrame"></iframe>
+  </div>
+
+  <div class="floating-header" id="floatingHeader">
+    <span class="header-exam" id="headerExam">Exam</span>
+    <div class="header-divider"></div>
+    <span class="timer" id="timer">--:--:--</span>
+    <div class="header-divider"></div>
+    <button class="header-btn" title="Fullscreen" onclick="toggleFullscreen()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    var params = new URLSearchParams(window.location.search);
+    var sessionId = params.get('session');
+    var examTitle = params.get('exam') || 'Exam';
+    var endTime = params.get('end');
+
+    document.getElementById('examBadge').textContent = examTitle;
+    document.getElementById('headerExam').textContent = examTitle;
+    document.title = examTitle + ' - Exam in Progress';
+
+    var timerInterval = null;
+
+    function updateTimer() {
+      if (!endTime) {
+        document.getElementById('timer').textContent = 'No time limit';
+        return;
+      }
+
+      var end = new Date(endTime);
+      var now = new Date();
+      var diff = end - now;
+
+      if (diff <= 0) {
+        document.getElementById('timer').textContent = '00:00:00';
+        document.getElementById('timeEnded').classList.add('visible');
+        if (timerInterval) clearInterval(timerInterval);
+        return;
+      }
+
+      var hours = Math.floor(diff / (1000 * 60 * 60));
+      var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      var timeStr = String(hours).padStart(2, '0') + ':' +
+                    String(minutes).padStart(2, '0') + ':' +
+                    String(seconds).padStart(2, '0');
+
+      var timerEl = document.getElementById('timer');
+      timerEl.textContent = timeStr;
+
+      // Warning states
+      timerEl.classList.remove('warning', 'critical');
+      if (diff < 5 * 60 * 1000) { // Less than 5 minutes
+        timerEl.classList.add('critical');
+      } else if (diff < 15 * 60 * 1000) { // Less than 15 minutes
+        timerEl.classList.add('warning');
+      }
+    }
+
+    function setStep(stepNum) {
+      for (var i = 1; i <= 3; i++) {
+        var step = document.getElementById('step' + i);
+        var indicator = step.querySelector('.step-indicator');
+        step.classList.remove('active', 'complete');
+        if (i < stepNum) {
+          step.classList.add('complete');
+          indicator.textContent = '\u2713';
+        } else if (i === stepNum) {
+          step.classList.add('active');
+          indicator.textContent = String(i);
+        } else {
+          indicator.textContent = String(i);
+        }
+      }
+    }
+
+    function setStatus(message) {
+      document.getElementById('loadingStatus').textContent = message;
+    }
+
+    function showError(message) {
+      document.getElementById('errorMessage').textContent = message;
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('errorScreen').classList.add('visible');
+    }
+
+    function showVNC() {
+      var wsPath = 'vnc/' + sessionId + '/websockify';
+      var vncUrl = '/vnc/' + sessionId + '/vnc.html?autoconnect=true&resize=scale&password=student&path=' + wsPath;
+      document.getElementById('vncFrame').src = vncUrl;
+
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('vncContainer').classList.add('visible');
+
+      setTimeout(function() {
+        document.getElementById('floatingHeader').classList.add('visible');
+      }, 500);
+
+      // Start timer
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    async function pollReady() {
+      if (!sessionId) {
+        showError('No exam session specified. Please use the exam link provided by your instructor.');
+        return;
+      }
+
+      setStep(1);
+      setStatus('Creating isolated workspace...');
+
+      await new Promise(function(r) { setTimeout(r, 500); });
+      setStep(2);
+      setStatus('Starting exam container...');
+
+      var attempts = 0;
+      var maxAttempts = 60;
+
+      var checkReady = async function() {
+        attempts++;
+
+        try {
+          var response = await fetch('/api/sessions/' + sessionId + '/status');
+          var data = await response.json();
+
+          if (data.status === 'ready') {
+            setStep(3);
+            setStatus('Connecting to exam desktop...');
+
+            await new Promise(function(r) { setTimeout(r, 500); });
+            setStatus('Connected! Good luck!');
+
+            await new Promise(function(r) { setTimeout(r, 300); });
+            showVNC();
+            return;
+          }
+        } catch (err) {
+          console.log('Waiting for exam container...', err.message);
+        }
+
+        if (attempts >= maxAttempts) {
+          showError('Timed out waiting for exam environment. Please try again or contact your instructor.');
+          return;
+        }
+
+        if (attempts % 10 === 0) {
+          setStatus('Starting exam container... (' + attempts + 's)');
+        }
+
+        setTimeout(checkReady, 1000);
+      };
+
+      checkReady();
+    }
+
+    pollReady();
+  </script>
+</body>
+</html>
