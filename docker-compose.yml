@@ -14,8 +14,9 @@ services:
     environment:
       - DOCKER_NETWORK=secure-exam_vnc-internal
       - DATA_DIR=/data
-      - HOST_DATA_DIR=/Users/randymichak/Desktop/secure-exam/data
+      - HOST_DATA_DIR=/Users/randymichak/Desktop/kasm-vibe/data
 
 networks:
   vnc-internal:
-    driver: bridge
+    name: secure-exam_vnc-internal
+    external: true
